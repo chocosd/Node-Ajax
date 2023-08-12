@@ -1,0 +1,29 @@
+{
+  "name": "node-ajax",
+  "version": "1.0.0",
+  "description": "Rxjs ajax alternative for node",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "tsc": "tsc"
+  },
+  "keywords": [
+    "node",
+    "rxjs",
+    "ajax",
+    "node-ajax",
+    "observables",
+    "http"
+  ],
+  "type": "module",
+  "typings": "index.d.ts",
+  "author": "Steven Dix",
+  "license": "ISC",
+  "dependencies": {
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.1.6"
+  }
+}
