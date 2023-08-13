@@ -11,6 +11,11 @@ export type NodeAjaxOptions<TOptions = any> = {
   params?: Record<string, string | number | boolean>;
 };
 
+export type NodeAjaxRequestOptions<TOptions> = Omit<
+  NodeAjaxOptions<TOptions>,
+  "url" | "body" | "method"
+>;
+
 export type HttpMethods = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 function handleContentType<T>(
@@ -136,7 +141,7 @@ export class NodeAjax {
 
   static get<TConfig>(
     url: string,
-    options?: Omit<NodeAjaxOptions<TConfig>, "url" | "body">
+    options?: NodeAjaxRequestOptions<TConfig>
   ): Observable<TConfig> {
     const instance = new NodeAjax("GET");
     return instance.request<TConfig>(url, options);
@@ -145,7 +150,7 @@ export class NodeAjax {
   static post<TConfig>(
     url: string,
     body: TConfig,
-    options?: Omit<NodeAjaxOptions<TConfig>, "url" | "body">
+    options?: NodeAjaxRequestOptions<TConfig>
   ): Observable<TConfig> {
     const instance = new NodeAjax("POST");
     return instance.request<TConfig>(url, body, options);
@@ -154,7 +159,7 @@ export class NodeAjax {
   static patch<TConfig>(
     url: string,
     body: TConfig,
-    options?: Omit<NodeAjaxOptions<TConfig>, "url" | "body">
+    options?: NodeAjaxRequestOptions<TConfig>
   ): Observable<TConfig> {
     const instance = new NodeAjax("PATCH");
     return instance.request<TConfig>(url, body, options);
@@ -163,7 +168,7 @@ export class NodeAjax {
   static put<TConfig>(
     url: string,
     body: TConfig,
-    options?: Omit<NodeAjaxOptions<TConfig>, "url" | "body">
+    options?: NodeAjaxRequestOptions<TConfig>
   ): Observable<TConfig> {
     const instance = new NodeAjax("PUT");
     return instance.request<TConfig>(url, body, options);
@@ -171,7 +176,7 @@ export class NodeAjax {
 
   static delete<TConfig>(
     url: string,
-    options?: Omit<NodeAjaxOptions<TConfig>, "url" | "body">
+    options?: NodeAjaxRequestOptions<TConfig>
   ): Observable<TConfig> {
     const instance = new NodeAjax("DELETE");
     return instance.request<TConfig>(url, options);
