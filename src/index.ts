@@ -1,11 +1,11 @@
 import * as https from "https";
 import { Observable } from "rxjs";
 
-export type NodeAjaxOptions<T = any> = {
+export type NodeAjaxOptions<TOptions = any> = {
   url: string;
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   headers?: Record<string, string>;
-  body?: T;
+  body?: TOptions;
   contentType?: "json" | "text" | "form";
   timeout?: number;
 };
