@@ -8,51 +8,65 @@ export type NodeAjaxOptions<TOptions = any> = {
   body?: TOptions;
   contentType?: "json" | "text" | "form";
   timeout?: number;
+  params?: Record<string, string | number | boolean>;
 };
 
-export function NodeAjax<T>(options: NodeAjaxOptions): Observable<T> {
+function handleContentType<T>(
+  contentType: string | undefined,
+  body: T | undefined,
+  headers: Record<string, string> | undefined
+): [Record<string, string> | undefined, string | undefined] {
+  if (!body) return [headers, undefined];
+
+  switch (contentType || "json") {
+    case "json":
+      return [
+        { ...headers, "Content-Type": "application/json" },
+        JSON.stringify(body),
+      ];
+    case "form":
+      return [
+        { ...headers, "Content-Type": "application/x-www-form-urlencoded" },
+        new URLSearchParams(stringifyValues(body)).toString(),
+      ];
+    case "text":
+      return [{ ...headers, "Content-Type": "text/plain" }, body as string];
+    default:
+      throw new Error("Unsupported content type");
+  }
+}
+
+const stringifyValues = (obj: Record<string, unknown>) =>
+  Object.fromEntries(
+    Object.entries(obj).map(([key, value]) => [key, String(value)])
+  );
+
+export function NodeAjax<T>(options: NodeAjaxOptions<T>): Observable<T> {
   return new Observable<T>((observer) => {
     const urlObj = new URL(options.url);
-
-    let requestBody: string | undefined;
     const timeout: number = options.timeout || 5000;
+    let requestBody: any;
+
+    // Append query parameters if present
+    if (options.params) {
+      for (const [key, value] of Object.entries(options.params)) {
+        urlObj.searchParams.append(key, value.toString());
+      }
+    }
 
     if (options.body) {
       // Default to 'json' if contentType is not provided
       const contentType = options.contentType || "json";
 
-      switch (contentType) {
-        case "json":
-          options.headers = {
-            ...options.headers,
-            ["Content-Type"]: "application/json",
-          };
-          requestBody = JSON.stringify(options.body);
-          break;
-        case "form":
-          options.headers = {
-            ...options.headers,
-            ["Content-Type"]: "application/x-www-form-urlencoded",
-          };
-          requestBody = Object.keys(options.body)
-            .map(
-              (key) =>
-                encodeURIComponent(key) +
-                "=" +
-                encodeURIComponent(options.body![key])
-            )
-            .join("&");
-          break;
-        case "text":
-          options.headers = {
-            ...options.headers,
-            ["Content-Type"]: "text/plain",
-          };
-          requestBody = options.body as string;
-          break;
-        default:
-          observer.error(new Error("Unsupported content type"));
-          return;
+      try {
+        [options.headers, requestBody] = handleContentType<T>(
+          contentType,
+          options.body,
+          options.headers
+        );
+      } catch (error) {
+        observer.error(error);
+        return;
       }
 
       if (requestBody && options.headers) {
@@ -74,6 +88,16 @@ export function NodeAjax<T>(options: NodeAjaxOptions): Observable<T> {
       response.on("data", (chunk) => {
         data += chunk;
       });
+
+      // Error handling for response status code
+      if (response.statusCode && response.statusCode >= 400) {
+        const message = data ? JSON.parse(data).message : undefined;
+        observer.error({
+          status: response.statusCode,
+          message: message || "An error occurred",
+        });
+        return;
+      }
 
       response.on("end", () => {
         try {

@@ -4,9 +4,9 @@
   "description": "Rxjs ajax alternative for node",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "build": "tsc",
-    "tsc": "tsc"
+    "tsc": "tsc --watch"
   },
   "keywords": [
     "node",
