@@ -1,6 +1,6 @@
 {
   "name": "node-rxjs-ajax",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Rxjs ajax alternative for node",
   "main": "dist/index.js",
   "scripts": {
@@ -17,7 +17,7 @@
     "http"
   ],
   "type": "module",
-  "typings": "index.d.ts",
+  "typings": "dist/index.d.ts",
   "author": "Steven Dix",
   "license": "ISC",
   "dependencies": {
