@@ -1,6 +1,6 @@
 {
   "name": "node-rxjs-ajax",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Rxjs ajax alternative for node",
   "main": "dist/index.js",
   "scripts": {

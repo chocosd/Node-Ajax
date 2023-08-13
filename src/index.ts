@@ -177,18 +177,18 @@ export class NodeAjax {
     return instance.request<TConfig>(url, options);
   }
 
-  private request<TConfig>(url: string): Observable<TConfig>;
-  private request<TConfig>(url: string, body?: TConfig): Observable<TConfig>;
-  private request<TConfig>(
+  protected request<TConfig>(url: string): Observable<TConfig>;
+  protected request<TConfig>(url: string, body?: TConfig): Observable<TConfig>;
+  protected request<TConfig>(
     url: string,
     options?: Partial<NodeAjaxOptions<TConfig>>
   ): Observable<TConfig>;
-  private request<TConfig>(
+  protected request<TConfig>(
     url: string,
     body?: TConfig,
     options?: Partial<NodeAjaxOptions<TConfig>>
   ): Observable<TConfig>;
-  private request<TConfig>(
+  protected request<TConfig>(
     url: string,
     body?: TConfig,
     options?: Partial<NodeAjaxOptions<TConfig>>
