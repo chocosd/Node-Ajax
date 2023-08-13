@@ -3,13 +3,15 @@ import { Observable } from "rxjs";
 
 export type NodeAjaxOptions<TOptions = any> = {
   url: string;
-  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  method?: HttpMethods;
   headers?: Record<string, string>;
   body?: TOptions;
   contentType?: "json" | "text" | "form";
   timeout?: number;
   params?: Record<string, string | number | boolean>;
 };
+
+export type HttpMethods = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 function handleContentType<T>(
   contentType: string | undefined,
@@ -41,7 +43,7 @@ const stringifyValues = (obj: Record<string, unknown>) =>
     Object.entries(obj).map(([key, value]) => [key, String(value)])
   );
 
-export function NodeAjax<T>(options: NodeAjaxOptions<T>): Observable<T> {
+function nodeAjax<T>(options: NodeAjaxOptions<T>): Observable<T> {
   return new Observable<T>((observer) => {
     const urlObj = new URL(options.url);
     const timeout: number = options.timeout || 5000;
@@ -123,4 +125,79 @@ export function NodeAjax<T>(options: NodeAjaxOptions<T>): Observable<T> {
 
     request.end();
   });
+}
+
+export class NodeAjax {
+  protected method: HttpMethods;
+
+  constructor(public Method: HttpMethods = "GET") {
+    this.method = Method;
+  }
+
+  static get<TConfig>(
+    url: string,
+    options?: Omit<NodeAjaxOptions<TConfig>, "url" | "body">
+  ): Observable<TConfig> {
+    const instance = new NodeAjax("GET");
+    return instance.request<TConfig>(url, options);
+  }
+
+  static post<TConfig>(
+    url: string,
+    body: TConfig,
+    options?: Omit<NodeAjaxOptions<TConfig>, "url" | "body">
+  ): Observable<TConfig> {
+    const instance = new NodeAjax("POST");
+    return instance.request<TConfig>(url, body, options);
+  }
+
+  static patch<TConfig>(
+    url: string,
+    body: TConfig,
+    options?: Omit<NodeAjaxOptions<TConfig>, "url" | "body">
+  ): Observable<TConfig> {
+    const instance = new NodeAjax("PATCH");
+    return instance.request<TConfig>(url, body, options);
+  }
+
+  static put<TConfig>(
+    url: string,
+    body: TConfig,
+    options?: Omit<NodeAjaxOptions<TConfig>, "url" | "body">
+  ): Observable<TConfig> {
+    const instance = new NodeAjax("PUT");
+    return instance.request<TConfig>(url, body, options);
+  }
+
+  static delete<TConfig>(
+    url: string,
+    options?: Omit<NodeAjaxOptions<TConfig>, "url" | "body">
+  ): Observable<TConfig> {
+    const instance = new NodeAjax("DELETE");
+    return instance.request<TConfig>(url, options);
+  }
+
+  private request<TConfig>(url: string): Observable<TConfig>;
+  private request<TConfig>(url: string, body?: TConfig): Observable<TConfig>;
+  private request<TConfig>(
+    url: string,
+    options?: Partial<NodeAjaxOptions<TConfig>>
+  ): Observable<TConfig>;
+  private request<TConfig>(
+    url: string,
+    body?: TConfig,
+    options?: Partial<NodeAjaxOptions<TConfig>>
+  ): Observable<TConfig>;
+  private request<TConfig>(
+    url: string,
+    body?: TConfig,
+    options?: Partial<NodeAjaxOptions<TConfig>>
+  ): Observable<TConfig> {
+    return nodeAjax({
+      ...(options && { options }),
+      url,
+      ...(body && { body }),
+      method: this.method,
+    });
+  }
 }
