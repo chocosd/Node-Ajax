@@ -18,20 +18,35 @@ We can use our options object to build our http parts, simply import NodeAjax fr
 ```
 import { NodeAjax } from 'node-rxjs-ajax';
 
-NodeAjax({
-    url: '',
-    contentType: 'json',
-    method: 'GET'
-}).pipe(
-    // add any operators you need
-).subscribe((data) => {
-    // do something with your data when subscribed
-});
+NodeAjax.get<T>('https://our-request-api/resource').pipe(/* any operators you need ).subscribe();
+```
 
-// a get request with a generic for our expected output
+Requests also have an options object we can pass in like so:
 
-NodeAjax<expectedResponse>(
-    // nodeAjax options
-).pipe().subscribe();
+```
+{
+    headers?: Record<string, string>;
+    contentType?: "json" | "text" | "form";
+    timeout?: number;
+    params?: Record<string, string | number | boolean>;
+}
+```
 
+And for .patch, .put and .post our generics need to follow our body we place in like so:
+
+```
+interface ProfileData {
+    username: string;
+    avatar: string;
+    bio: string;
+    age: number;
+}
+
+// this will return Observable<ProfileData> //
+NodeAjax.post<ProfileData>('https://our-request-api/resource', {
+    username: 'JohnDoe',
+    avatar: '',
+    bio: 'John Doe, international man of mystery',
+    age: 30
+}).subscribe();
 ```
